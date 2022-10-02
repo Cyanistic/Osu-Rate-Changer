@@ -52,6 +52,7 @@ if(input() == "1"):
 else:
     rate = float(input("Enter the new Rate: "))
 mapData = open(choice, "r").readlines()
+
 for line in range(len(mapData)):
     if(mapData[line].startswith("AudioFilename:")):
         audio = mapData[line][14:mapData[line].find(".mp3")].strip()
@@ -59,14 +60,50 @@ for line in range(len(mapData)):
     elif(mapData[line].startswith("PreviewTime:")):
         prevTime = int(mapData[line][12:].strip())
         mapData[line] = f"{mapData[line][:12]} {int(prevTime/rate)}\n"
+    elif(mapData[line].startswith("Mode:")):
+        gamemode = int(mapData[line][5:].strip())
     elif(mapData[line].startswith("Version:")):
         diffName = mapData[line][8:].strip()
         mapData[line] = f"{mapData[line][:8]}{diffName} ({rate}x)\n"
         break
 startIndex = mapData.index("[HitObjects]\n")+1
-for line in range(startIndex, len(mapData)-1):
-    commaIndex = trimmer(mapData[line], ",", 2)
-    mapData[line] = mapData[line][:commaIndex] + str(int(int(mapData[line][commaIndex:mapData[line].find(",", commaIndex+1)])/rate)) + mapData[line][trimmer(mapData[line], ",", 3)-1:trimmer(mapData[line], ",", 5)] + str(int(int(mapData[line][trimmer(mapData[line], ",", 5):mapData[line].find(":")])/rate)) + mapData[line][mapData[line].find(":"):]
+if(gamemode == 0):
+    userAR = int(input("Enter the new approach rate for map (enter 0 to leave unchanged): "))
+    while (0 > userAR or userAR > 10):
+        print("Invalid Approach Rate!\n")
+        userAR = int(input("Enter the new approach rate for map (enter 0 to leave unchanged): "))
+    if(not userAR == 0):
+        for line in range(len(mapData)):
+            if(mapData[line].startswith("ApproachRate:")): mapData[line] = f"ApproachRate:{userAR}\n"
+    for line in range(startIndex, len(mapData)):
+        commaIndex = trimmer(mapData[line], ",", 2)
+        storage = mapData[line][:commaIndex] + str(int(int(mapData[line][commaIndex:mapData[line].find(",", commaIndex+1)])/rate))
+        if(("|" in mapData[line]) or (trimmer(mapData[line], ",", 6) < 5)):
+            storage += mapData[line][trimmer(mapData[line], ",", 3)-1:]
+        else:
+            storage += mapData[line][trimmer(mapData[line], ",", 3)-1:trimmer(mapData[line], ",", 5)] + str(int(int(mapData[line][trimmer(mapData[line], ",", 5):trimmer(mapData[line], ",", 6)-1])/rate)) + mapData[line][trimmer(mapData[line], ",", 6)-1:]
+        
+        mapData[line] = storage
+elif (gamemode == 1):
+    for line in range(startIndex, len(mapData)):
+        commaIndex = trimmer(mapData[line], ",", 2)
+        mapData[line] = mapData[line][:commaIndex] + str(int(int(mapData[line][commaIndex:mapData[line].find(",", commaIndex+1)])/rate)) + mapData[line][trimmer(mapData[line], ",", 3)-1:]
+elif(gamemode == 2):
+     for line in range(startIndex, len(mapData)):
+        commaIndex = trimmer(mapData[line], ",", 2)
+        storage = mapData[line][:commaIndex] + str(int(int(mapData[line][commaIndex:mapData[line].find(",", commaIndex+1)])/rate))
+        if(("|" in mapData[line]) or (trimmer(mapData[line], ",", 6) < 5)):
+            storage += mapData[line][trimmer(mapData[line], ",", 3)-1:]
+        else:
+            storage += mapData[line][trimmer(mapData[line], ",", 3)-1:trimmer(mapData[line], ",", 5)] + str(int(int(mapData[line][trimmer(mapData[line], ",", 5):trimmer(mapData[line], ",", 6)-1])/rate)) + mapData[line][trimmer(mapData[line], ",", 6)-1:]
+        
+        mapData[line] = storage
+elif(gamemode == 3):
+    for line in range(startIndex, len(mapData)):
+        commaIndex = trimmer(mapData[line], ",", 2)
+        mapData[line] = mapData[line][:commaIndex] + str(int(int(mapData[line][commaIndex:mapData[line].find(",", commaIndex+1)])/rate)) + mapData[line][trimmer(mapData[line], ",", 3)-1:trimmer(mapData[line], ",", 5)] + str(int(int(mapData[line][trimmer(mapData[line], ",", 5):mapData[line].find(":")])/rate)) + mapData[line][mapData[line].find(":"):]
+else:
+    print("uh waltuh")
 
 mp3Audio = AudioSegment.from_file(f"{path}/{audio}.mp3", format="mp3")
 newAudio = f"{audio} ({rate}x)"
