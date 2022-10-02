@@ -27,6 +27,9 @@ else:
     while not os.path.exists(path):
         print("Directory not found, please try again")
         path = input("Enter your osu! Songs directory: ")
+    if not (path.endswith("/") or path.endswith('\\')):
+        if "/" in path: path += "/"
+        else: path += "\\"
     config = open("osuRateConfig.cfg", "w").write(path)
 
 # Creates an array to store all difficulties in song folder
