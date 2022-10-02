@@ -144,7 +144,10 @@ while True:
     elif event == "searchButton":
         os.chdir(path)
         updatedFolders = sorted(filter(lambda x: values["folders"].lower() in x.lower(), os.listdir()))
-        if(values["folders"] == updatedFolders[updatedFolders.index(values["folders"])]): updatedFolders = [updatedFolders[updatedFolders.index(values["folders"])]]
+        try:
+            if(values["folders"].lower() == updatedFolders[updatedFolders.index(values["folders"])].lower()): updatedFolders = [updatedFolders[updatedFolders.index(values["folders"])]]
+        except:
+            updatedFolders = sorted(filter(lambda x: values["folders"].lower() in x.lower(), os.listdir()))
         window['folders'].update(value=updatedFolders[0], values=updatedFolders)
         if(os.path.exists(path + updatedFolders[0])):
             os.chdir(path + updatedFolders[0])
