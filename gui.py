@@ -35,6 +35,11 @@ def generateFiles(path, mapFile, rate):
 
     # Uses the formula for the corresponding gamemode and modifies the rate of the map in the .osu file
     startIndex = mapData.index("[HitObjects]\n") + 1
+    for line in range(mapData.index("[TimingPoints]\n")+1,startIndex):
+        try:
+            mapData[line] = f"{int(int(mapData[line][:mapData[line].index(',')])/rate)}{mapData[line][mapData[line].index(','):]}"
+        except:
+            pass
     if gamemode == 0:
         arPopup = sg.Window("AR Popup", [[sg.Text("Enter new AR (Enter 0 to leave unchanged)")],[sg.Input(key="arBox")],[sg.Button("Submit")],[sg.Text("", key = "result")]])
         while True:

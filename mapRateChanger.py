@@ -82,6 +82,11 @@ for line in range(len(mapData)):
 
 # Uses the formula for the corresponding gamemode and modifies the rate of the map in the .osu file
 startIndex = mapData.index("[HitObjects]\n") + 1
+for line in range(mapData.index("[TimingPoints]\n")+1,startIndex):
+    try:
+        mapData[line] = f"{int(int(mapData[line][:mapData[line].index(',')])/rate)}{mapData[line][mapData[line].index(','):]}"
+    except:
+        pass
 if gamemode == 0:
     userAR = int(
         input("Enter the new approach rate for map (enter 0 to leave unchanged): ")
