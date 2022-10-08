@@ -131,8 +131,8 @@ else:
     osuDir.close()
 
 os.chdir(path)
-folderList = sg.Combo(sorted(os.listdir()), size = (40,8), key = "folders")
-diffList = sg.Listbox(list([]), size = (100,6), enable_events=True, key='_LIST_')
+folderList = sg.Combo(sorted(os.listdir()), size = (80,8), key = "folders")
+diffList = sg.Listbox(list([]), size = (200,6), enable_events=True, key='_LIST_')
 layout = [
     [sg.Text("Folder Name: "), folderList, sg.Button("Search/Select", key = "searchButton")],
     [sg.Text("Difficulty: "), diffList], 
@@ -140,7 +140,7 @@ layout = [
     [sg.Button("Create File and Audio", key = "submitButton"), sg.Text("", key="resultText")]
     ]
 
-window = sg.Window("Osu Rate Changer", layout, size = (600, 200), icon ="abl")
+window = sg.Window("Osu Rate Changer", layout, size = (800, 200), icon ="abl", resizable=True)
 while True:
     event, values = window.read()
 
@@ -153,11 +153,14 @@ while True:
             if(values["folders"].lower() == updatedFolders[updatedFolders.index(values["folders"])].lower()): updatedFolders = [updatedFolders[updatedFolders.index(values["folders"])]]
         except:
             updatedFolders = sorted(filter(lambda x: values["folders"].lower() in x.lower(), os.listdir()))
-        window['folders'].update(value=updatedFolders[0], values=updatedFolders)
-        if(os.path.exists(path + updatedFolders[0])):
-            os.chdir(path + updatedFolders[0])
-            songs = list(filter(lambda x: x.endswith(".osu"),os.listdir()))
-            window['_LIST_'].update(songs)
+        try:
+            window['folders'].update(value=updatedFolders[0], values=updatedFolders)
+            if(os.path.exists(path + updatedFolders[0])):
+                os.chdir(path + updatedFolders[0])
+                songs = list(filter(lambda x: x.endswith(".osu"),os.listdir()))
+                window['_LIST_'].update(songs)
+        except:
+            window["resultText"].update("Error, folder name not found")
     elif event == "submitButton":
         
         try:
@@ -166,8 +169,8 @@ while True:
             generateFiles(path + updatedFolders[0],chosenDiff,float(values["inputRate"]))
             window["resultText"].update("New difficulty and audio successfully created! Search for an empty string to change the rate of another map!")
         except ValueError:
-            window["resultText"].update("Error, Invalid Rate")
+            window["resultText"].update("Error, invalid rate")
         except:
-            window["resultText"].update("Error, Something Went Wrong")
+            window["resultText"].update("Error, something went wrong")
 
 window.close()
