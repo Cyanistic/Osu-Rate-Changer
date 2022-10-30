@@ -68,8 +68,9 @@ mapData = open(choice, "r").readlines()
 # Updates .osu file map data to correspond with new audio and file
 for line in range(len(mapData)):
     if mapData[line].startswith("AudioFilename:"):
-        audio = mapData[line][14 : mapData[line].find(".mp3")].strip()
-        mapData[line] = f"{mapData[line][:14]}{audio} ({rate}x).mp3\n"
+        extension = mapData[line][mapData[line].rindex(".")+1:].strip()
+        audio = mapData[line][14 : mapData[line].find(extension)-1].strip()
+        mapData[line] = f"{mapData[line][:14]}{audio} ({rate}x).{extension}\n"
     elif mapData[line].startswith("PreviewTime:"):
         prevTime = int(mapData[line][12:].strip())
         mapData[line] = f"{mapData[line][:12]} {int(prevTime/rate)}\n"
@@ -143,8 +144,8 @@ else:
     print("uh waltuh")
 
 # Creates new audio file with rate change
-mp3Audio = AudioSegment.from_file(f"{path}/{audio}.mp3", format="mp3")
-fileExport = speedChange(mp3Audio, rate).export(f"{path}/{audio} ({rate}x).mp3", format="mp3")
+finAudio = AudioSegment.from_file(f"{path}/{audio}.{extension}", format=extension)
+fileExport = speedChange(finAudio, rate).export(f"{path}/{audio} ({rate}x).{extension}", format=extension)
 
 # Exports .osu! data to a file
 fileSave = open(f"{choice[:choice.find('.osu')]} ({rate}x).osu", "w+")
