@@ -116,7 +116,7 @@ sg.theme('dark grey 9')
 if os.path.exists("osuRateConfig.cfg") and os.path.exists(open("osuRateConfig.cfg", "r").readline()):
     path = open("osuRateConfig.cfg", "r").readline()
 else:
-    dirLayout = [[sg.Text("Enter the path of your osu! songs folder: ")],[sg.Input(key = "dirInput")],[sg.Button("Submit", key = "dirButton")]]
+    dirLayout = [[sg.Text("Enter the path of your osu! songs folder: ")],[sg.Input(key = "dirInput"), sg.FolderBrowse()],[sg.Button("Submit", key = "dirButton")]]
     osuDir = sg.Window("Converter", dirLayout)
     while True:
         event, values = osuDir.read()
