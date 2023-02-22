@@ -1,13 +1,15 @@
 import PySimpleGUI as sg
 import logging
 from pydub import AudioSegment
+from pydub.effects import speedup
 import os
 
 # Function to make generate a new audio file with a speed change from old file
-def speedChange(audio, rate):
+def speedChange(audio, rate, changePitch):
+
     return audio._spawn(
         audio.raw_data, overrides={"frame_rate": int(audio.frame_rate * rate)}
-    )
+    ) if changePitch else speedup(audio, rate)
 
 # Function to find the nth occurance of a character in a string
 def trimmer(string, divider, times):
@@ -17,8 +19,9 @@ def trimmer(string, divider, times):
         index += 1
     return index
 
-def generateFiles(path, mapFile, rate):
+def generateFiles(path, mapFile, rate, changePitch):
     mapData = open(mapFile, "r").readlines()
+    gamemode = None
 
     for line in range(len(mapData)):
         if mapData[line].startswith("AudioFilename:"):
@@ -105,7 +108,8 @@ def generateFiles(path, mapFile, rate):
 
     # Creates new audio file with rate change
     finAudio = AudioSegment.from_file(f"{path}/{audio}.{extension}", format=extension)
-    fileExport = speedChange(finAudio, rate).export(f"{path}/{audio} ({rate}x).{extension}", format=extension)
+    # Export File
+    speedChange(finAudio, rate, changePitch).export(f"{path}/{audio} ({rate}x).{extension}", format=extension)
 
     # Exports .osu! data to a file
     fileSave = open(f"{mapFile[:mapFile.find('.osu')]} ({rate}x).osu", "w+")
@@ -137,8 +141,8 @@ folderList = sg.Combo(sorted(os.listdir()), size = (80,8), key = "folders")
 diffList = sg.Listbox(list([]), size = (200,6), enable_events=True, key='_LIST_')
 layout = [
     [sg.Text("Folder Name: "), folderList, sg.Button("Search/Select", key = "searchButton")],
-    [sg.Text("Difficulty: "), diffList], 
-    [sg.Text("Rate: "),sg.Input(key = "inputRate")],
+    [sg.Text("Difficulty: "), diffList],
+    [sg.Text("Rate: "),sg.Input(key = "inputRate"), sg.Text("Change Pitch? "), sg.Checkbox("", key="inputPitch")],
     [sg.Button("Create File and Audio", key = "submitButton"), sg.Text("", key="resultText")]
     ]
 
@@ -168,7 +172,7 @@ while True:
         try:
             chosenDiff = songs[window.Element('_LIST_').Widget.curselection()[0]]
             window["resultText"].update("Working...")
-            generateFiles(path + updatedFolders[0],chosenDiff,float(values["inputRate"]))
+            generateFiles(path + updatedFolders[0],chosenDiff,float(values["inputRate"]), values["inputPitch"])
             window["resultText"].update("New difficulty and audio successfully created! Search for an empty string to change the rate of another map!")
         except ValueError:
             window["resultText"].update("Error, invalid rate")
