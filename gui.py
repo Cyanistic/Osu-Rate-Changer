@@ -6,11 +6,7 @@ import os
 
 # Function to make generate a new audio file with a speed change from old file
 def speedChange(audio, rate, changePitch):
-
-    return audio._spawn(
-        audio.raw_data, overrides={"frame_rate": int(audio.frame_rate * rate)}
-    ) if changePitch else speedup(audio, rate)
-
+        return audio._spawn(audio.raw_data, overrides={"frame_rate": int(audio.frame_rate * rate)}) if changePitch else speedup(audio, rate, rate*200)
 # Function to find the nth occurance of a character in a string
 def trimmer(string, divider, times):
     index = 0
@@ -107,6 +103,7 @@ def generateFiles(path, mapFile, rate, changePitch):
         print("uh waltuh")
 
     # Creates new audio file with rate change
+
     finAudio = AudioSegment.from_file(f"{path}/{audio}.{extension}", format=extension)
     # Export File
     speedChange(finAudio, rate, changePitch).export(f"{path}/{audio} ({rate}x).{extension}", format=extension)
